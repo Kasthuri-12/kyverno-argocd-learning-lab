@@ -1,0 +1,17 @@
+# Lets Kyverno's background controller create the objects the generate policies produce.
+# The labels make this role aggregate into the controller's existing ClusterRole.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: kyverno:generate-networkpolicies-and-quotas
+  labels:
+    app.kubernetes.io/component: background-controller
+    app.kubernetes.io/instance: kyverno
+    app.kubernetes.io/part-of: kyverno
+rules:
+- apiGroups: ["networking.k8s.io"]
+  resources: ["networkpolicies"]
+  verbs: ["create", "update", "delete", "get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["resourcequotas"]
+  verbs: ["create", "update", "delete", "get", "list", "watch"]

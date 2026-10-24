@@ -1,0 +1,33 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: default-resourcequota
+  annotations:
+    policies.kyverno.io/title: Default ResourceQuota
+    policies.kyverno.io/category: Multi-Tenancy
+    policies.kyverno.io/subject: Namespace, ResourceQuota
+    policies.kyverno.io/description: >-
+      Creates a ResourceQuota in every Namespace labelled managed-quota=true.
+spec:
+  rules:
+  - name: generate-quota
+    match:
+      any:
+      - resources:
+          kinds:
+          - Namespace
+          selector:
+            matchLabels:
+              managed-quota: "true"
+    generate:
+      apiVersion: v1
+      kind: ResourceQuota
+      name: default-quota
+      namespace: "{{request.object.metadata.name}}"
+      synchronize: true
+      data:
+        spec:
+          hard:
+            requests.cpu: "2"
+            requests.memory: 2Gi
+            limits.memory: 4Gi
