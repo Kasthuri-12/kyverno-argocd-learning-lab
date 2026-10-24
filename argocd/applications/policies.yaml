@@ -1,0 +1,26 @@
+# Syncs everything under policies/ to the cluster. Wave 1 so Kyverno and its CRDs exist first.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: policies
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Kasthuri-12/kyverno-argocd-learning-lab.git
+    targetRevision: main
+    path: policies
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    # The ClusterPolicy CRD may not exist yet during the first dry run.
+    - SkipDryRunOnMissingResource=true
+    - ServerSideApply=true

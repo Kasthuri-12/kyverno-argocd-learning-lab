@@ -1,0 +1,26 @@
+# Installs Kyverno from its Helm chart. Wave 0 so it is ready before the policies (wave 1).
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kyverno
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: default
+  source:
+    repoURL: https://kyverno.github.io/kyverno/
+    chart: kyverno
+    # Pin this to a chart version you have tested: helm search repo kyverno/kyverno --versions
+    targetRevision: "*"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kyverno
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
+    # Kyverno's CRDs are too large for client-side apply.
+    - ServerSideApply=true
