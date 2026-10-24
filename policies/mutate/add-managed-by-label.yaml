@@ -1,0 +1,24 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: add-managed-by-label
+  annotations:
+    policies.kyverno.io/title: Add Managed-By Label
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/subject: Pod, Label
+    policies.kyverno.io/description: >-
+      Adds the label managed-by=kyverno to every new Pod that does not already
+      have a managed-by label. The +() anchor means "add only if absent".
+spec:
+  rules:
+  - name: add-managed-by
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    mutate:
+      patchStrategicMerge:
+        metadata:
+          labels:
+            +(managed-by): kyverno
