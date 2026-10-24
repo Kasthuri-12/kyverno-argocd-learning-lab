@@ -1,0 +1,27 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-team-label
+  annotations:
+    policies.kyverno.io/title: Require Team Label
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: low
+    policies.kyverno.io/subject: Pod, Label
+    policies.kyverno.io/description: >-
+      Every Pod must carry a team label so cost and ownership can be reported.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: check-team-label
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "The label 'team' is required."
+      pattern:
+        metadata:
+          labels:
+            team: "?*"
