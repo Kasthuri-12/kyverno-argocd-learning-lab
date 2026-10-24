@@ -1,0 +1,42 @@
+# Run offline with the Kyverno CLI, no cluster needed:  kyverno test tests/
+# The test file format can differ between CLI versions; see docs/06-reports-exceptions-and-cli.md.
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: validate-policies
+policies:
+- ../policies/validate/disallow-latest-tag.yaml
+- ../policies/validate/require-requests-limits.yaml
+resources:
+- resources.yaml
+results:
+- policy: disallow-latest-tag
+  rule: validate-image-tag
+  resources:
+  - good-pod
+  kind: Pod
+  result: pass
+- policy: disallow-latest-tag
+  rule: validate-image-tag
+  resources:
+  - latest-tag-pod
+  kind: Pod
+  result: fail
+- policy: disallow-latest-tag
+  rule: require-image-tag
+  resources:
+  - no-tag-pod
+  kind: Pod
+  result: fail
+- policy: require-requests-limits
+  rule: validate-resources
+  resources:
+  - good-pod
+  kind: Pod
+  result: pass
+- policy: require-requests-limits
+  rule: validate-resources
+  resources:
+  - no-resources-pod
+  kind: Pod
+  result: fail

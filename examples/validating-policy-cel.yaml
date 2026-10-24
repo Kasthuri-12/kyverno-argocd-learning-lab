@@ -1,0 +1,22 @@
+# Newer CEL-based policy API, shown for comparison (see docs/09-new-policy-types.md).
+# It needs a Kyverno version that ships policies.kyverno.io/v1; check with:
+#   kubectl get crd | grep policies.kyverno.io
+# Modelled on the sample in the kyverno/policies README.
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: require-app-label
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods"]
+  validations:
+  - expression: "has(object.metadata.labels) && 'app' in object.metadata.labels"
+    message: "An app label is required."

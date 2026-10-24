@@ -1,0 +1,20 @@
+# Not applied by Argo CD (it lives outside policies/). Needs policy exceptions enabled in Kyverno,
+# see docs/06-reports-exceptions-and-cli.md. Check the apiVersion against your Kyverno version.
+apiVersion: kyverno.io/v2
+kind: PolicyException
+metadata:
+  name: allow-latest-for-legacy
+  namespace: legacy
+spec:
+  exceptions:
+  - policyName: disallow-latest-tag
+    ruleNames:
+    - require-image-tag
+    - validate-image-tag
+  match:
+    any:
+    - resources:
+        kinds:
+        - Pod
+        namespaces:
+        - legacy
